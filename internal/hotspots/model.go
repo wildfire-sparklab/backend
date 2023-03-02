@@ -36,17 +36,9 @@ func (acqTime *AcqTime) String() string {
 	return acqTime.string
 }
 
-type DateTime struct {
-	time.Time
-}
-
-//func (date *DateTime) UnmarshalCSV(csv string) (err error) {
-//	date.Time, err = time.Parse("2006-02-01", csv)
-//	return err
-//}
-
 type Hotspot struct {
-	Time time.Time
-	Long float64
-	Lan  float64
+	Time     time.Time
+	Long     float64
+	Lan      float64
+	DayNight string `csv:"daynight"`
 }
