@@ -40,5 +40,10 @@ type Hotspot struct {
 	Time     time.Time
 	Long     float64
 	Lan      float64
-	DayNight string `csv:"daynight"`
+	DayNight string
+}
+
+type IgnoreHotspot struct {
+	Long float64
+	Lan  float64
 }

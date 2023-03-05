@@ -2,25 +2,65 @@ package hotspots
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/gocarina/gocsv"
+	"gorm.io/gorm"
 	"io"
+	"math"
 	"net/http"
 	"time"
 	"wildfire-backend/internal/config"
 )
 
 type service struct {
-	cfg config.Config
+	cfg     config.Config
+	storage Storage
 }
 
 func NewHotSpotsService() *service {
-
 	return &service{}
 }
 
-func (s service) AddsHotsSpots() {
-	s.GetsHotSpots()
+func (s service) AddsHotsSpots(hotspots []Hotspot) {
+	var clearHotspots []Hotspot
+	for _, hotspot := range hotspots {
+		lan := math.Floor(hotspot.Lan*10) / 10
+		long := math.Floor(hotspot.Long*10) / 10
+		ok, err := s.storage.CheckHotSpot(lan, long)
+		if err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				clearHotspots = append(clearHotspots, hotspot)
+				continue
+			}
+			fmt.Println("error", err)
+			continue
+		}
+		if ok {
+			hots, _ := s.storage.GetHotSpot(lan, long, hotspot.Time)
+			if hots != nil {
+				continue
+			}
+			count, err := s.storage.CountHotSpot(lan, long)
+			if err != nil {
+				return
+			}
+			if count == 4 {
+				err := s.storage.AddIgnoreHotSpot(hotspot)
+				if err != nil {
+					return
+				}
+			} else {
+				clearHotspots = append(clearHotspots, hotspot)
+			}
+		}
+	}
+	for _, hotspot := range clearHotspots {
+		err := s.storage.AddHotSpot(hotspot)
+		if err != nil {
+			return
+		}
+	}
 }
 
 func (s service) GetsHotSpots() []Hotspot {
@@ -56,9 +96,10 @@ func (s service) GetsHotSpots() []Hotspot {
 	for _, h := range hotspots {
 		t, _ := time.Parse("2006-02-01 15:04", h.AcqData+" "+h.AcqTime.String())
 		hotspots1 = append(hotspots1, Hotspot{
-			Long: h.Longitude,
-			Lan:  h.Latitude,
-			Time: t,
+			Long:     h.Longitude,
+			Lan:      h.Latitude,
+			Time:     t,
+			DayNight: h.DayNight,
 		})
 	}
 	return hotspots1
@@ -71,7 +112,7 @@ func (s service) StartCheck() {
 		for {
 			select {
 			case <-ticker.C:
-				s.GetsHotSpots()
+				s.AddsHotsSpots(s.GetsHotSpots())
 			case <-quit:
 				ticker.Stop()
 				return
