@@ -13,16 +13,16 @@ import (
 	"wildfire-backend/internal/config"
 )
 
-type service struct {
+type Service struct {
 	cfg     config.Config
 	storage Storage
 }
 
-func NewHotSpotsService() *service {
-	return &service{}
+func NewHotSpotsService() *Service {
+	return &Service{}
 }
 
-func (s service) AddsHotsSpots(hotspots []Hotspot) {
+func (s Service) AddsHotsSpots(hotspots []Hotspot) {
 	var clearHotspots []Hotspot
 	for _, hotspot := range hotspots {
 		lan := math.Floor(hotspot.Lan*10) / 10
@@ -63,7 +63,7 @@ func (s service) AddsHotsSpots(hotspots []Hotspot) {
 	}
 }
 
-func (s service) GetsHotSpots() []Hotspot {
+func (s Service) GetsHotSpots() []Hotspot {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	t := time.Now()
@@ -103,20 +103,4 @@ func (s service) GetsHotSpots() []Hotspot {
 		})
 	}
 	return hotspots1
-}
-
-func (s service) StartCheck() {
-	ticker := time.NewTicker(time.Hour * 3)
-	quit := make(chan struct{})
-	go func() {
-		for {
-			select {
-			case <-ticker.C:
-				s.AddsHotsSpots(s.GetsHotSpots())
-			case <-quit:
-				ticker.Stop()
-				return
-			}
-		}
-	}()
 }
