@@ -2,14 +2,18 @@ package hotspots
 
 import (
 	"github.com/gin-gonic/gin"
+	"time"
 	"wildfire-backend/internal/handlers"
 )
 
 type handler struct {
+	storage Storage
 }
 
-func NewHotSpotHandler() handlers.Handler {
-	return &handler{}
+func NewHotSpotHandler(storage Storage) handlers.Handler {
+	return &handler{
+		storage: storage,
+	}
 }
 
 func (h handler) Register(router *gin.Engine) {
@@ -17,5 +21,16 @@ func (h handler) Register(router *gin.Engine) {
 }
 
 func (h *handler) GetHotSpots(ctx *gin.Context) {
-
+	//TODO parse time
+	t, err := time.Parse("", ctx.GetString("time"))
+	if err != nil {
+		ctx.JSON(500, "Error parse time")
+		return
+	}
+	hotspots, err := h.storage.GetHotSpots(t)
+	if err != nil {
+		ctx.JSON(500, "Server error")
+		return
+	}
+	ctx.JSON(200, hotspots)
 }

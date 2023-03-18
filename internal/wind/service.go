@@ -20,7 +20,7 @@ func NewWindService(cfg config.Config) *Service {
 	}
 }
 
-func (s Service) GetWind(Long float64, Lan float64) {
+func (s Service) GetWind(Long float64, Lan float64) Forecast5WeatherData {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	req, err := http.NewRequestWithContext(ctx, "GET", fmt.Sprintf("https://api.openweathermap.org/data/2.5/forecast?lat=%f&lon=%f&appid=%s", Lan, Long, s.cfg.WindKey), nil)
@@ -47,5 +47,5 @@ func (s Service) GetWind(Long float64, Lan float64) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(data)
+	return data
 }

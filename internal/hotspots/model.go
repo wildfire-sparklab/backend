@@ -37,6 +37,7 @@ func (acqTime *AcqTime) String() string {
 }
 
 type Hotspot struct {
+	Id       int64 `gorm:"primaryKey"`
 	Time     time.Time
 	Long     float64
 	Lan      float64
@@ -44,6 +45,7 @@ type Hotspot struct {
 }
 
 type IgnoreHotspot struct {
+	Id   int `gorm:"primaryKey"`
 	Long float64
 	Lan  float64
 }

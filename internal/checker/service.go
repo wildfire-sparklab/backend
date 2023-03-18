@@ -1,6 +1,7 @@
 package checker
 
 import (
+	"fmt"
 	"time"
 	"wildfire-backend/internal/hotspots"
 	"wildfire-backend/internal/wind"
@@ -11,12 +12,15 @@ type service struct {
 	w wind.Service
 }
 
-func NewChecker() *service {
-	return &service{}
+func NewChecker(h hotspots.Service, w wind.Service) *service {
+	return &service{
+		h: h,
+		w: w,
+	}
 }
 
 func (s service) StartCheck() {
-	ticker := time.NewTicker(time.Hour * 3)
+	ticker := time.NewTicker(time.Minute * 30)
 	quit := make(chan struct{})
 	go func() {
 		for {
@@ -32,5 +36,12 @@ func (s service) StartCheck() {
 }
 
 func (s service) Checker() {
-
+	hotspotss := s.h.GetsHotSpots()
+	s.h.AddsHotsSpots(hotspotss)
+	var winds []wind.Forecast5WeatherData
+	for _, hotspot := range hotspotss {
+		winds = append(winds, s.w.GetWind(hotspot.Long, hotspot.Lan))
+	}
+	//fmt.Println(winds)
+	fmt.Println(hotspotss)
 }
