@@ -60,6 +60,15 @@ type Forecast5WeatherData struct {
 	List []Forecast5WeatherList `json:"list"`
 }
 
+type ForecastWeatherList struct {
+	Dt   int  `json:"dt"`
+	Wind Wind `json:"wind"`
+}
+
+type WeatherData struct {
+	List []ForecastWeatherList `json:"list"`
+}
+
 func (f *Forecast5WeatherData) Decode(r io.Reader) error {
 	if err := json.NewDecoder(r).Decode(&f); err != nil {
 		return err

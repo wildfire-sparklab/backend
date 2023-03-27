@@ -75,8 +75,9 @@ func (s Service) AddsHotsSpots(hotspots []Hotspot) {
 func (s Service) GetsHotSpots() []Hotspot {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	t := time.Now()
-	req, err := http.NewRequestWithContext(ctx, "GET", "https://firms.modaps.eosdis.nasa.gov/api/area/csv/"+s.cfg.MapKey+"/VIIRS_SNPP_NRT/110,58,138,65/1/"+t.Format("2006-01-02"), nil)
+	//t := time.Now()
+	//req, err := http.NewRequestWithContext(ctx, "GET", "https://firms.modaps.eosdis.nasa.gov/api/area/csv/"+s.cfg.MapKey+"/VIIRS_SNPP_NRT/110,58,138,65/1/"+t.Format("2006-01-02"), nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", "https://firms.modaps.eosdis.nasa.gov/api/area/csv/"+s.cfg.MapKey+"/VIIRS_SNPP_NRT/110,58,138,65/1/2023-03-25", nil)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -105,7 +106,8 @@ func (s Service) GetsHotSpots() []Hotspot {
 	for _, h := range hotspots {
 		t, err := time.Parse("2006-01-02 15:04", h.AcqData+" "+h.AcqTime.String())
 		if err != nil {
-			panic(err)
+			fmt.Println("error")
+			continue
 		}
 		//fmt.Println(h.AcqData+" "+h.AcqTime.String(), t)
 		hotspots1 = append(hotspots1, Hotspot{

@@ -10,6 +10,7 @@ type Config struct {
 	MapKey   string   `yaml:"mapKey" env:"MAP_KEY"`
 	WindKey  string   `yaml:"windKey" env:"WIND_KEY"`
 	Postgres Postgres `yaml:"postgres"`
+	AMQP     string   `yaml:"amqp" env:"AMQP"`
 }
 
 type Postgres struct {

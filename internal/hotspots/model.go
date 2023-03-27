@@ -26,10 +26,10 @@ type AcqTime struct {
 
 func (acqTime *AcqTime) UnmarshalCSV(csv string) (err error) {
 	chars := []rune(csv)
-	m := chars[1:]
-	h := chars[:1]
+	m := chars[2:]
+	h := chars[:2]
 	acqTime.string = string(h) + ":" + string(m)
-	return err
+	return nil
 }
 
 func (acqTime *AcqTime) String() string {
