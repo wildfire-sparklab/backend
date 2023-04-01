@@ -1,14 +1,15 @@
-package postgres
+package mysql
 
 import (
 	"context"
 	"fmt"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 	"log"
 	"time"
 	"wildfire-backend/internal/config"
 	"wildfire-backend/pkg/utils"
+
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
 type Client struct {
@@ -16,16 +17,15 @@ type Client struct {
 	error
 }
 
-func NewClient(ctx context.Context, maxAttemps int, sc config.Postgres) (client *Client) {
+func NewClient(ctx context.Context, maxAttemps int, sc config.MySQL) (client *Client) {
 	var pool *gorm.DB
 	var err error
-	dsn := fmt.Sprintf("host=%s user=%s password=%s database=%s port=%s sslmode=disable TimeZone=Asia/Yakutsk", sc.Host, sc.User, sc.Password, sc.DB, sc.Port)
-	fmt.Println(dsn)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", sc.User, sc.Password, sc.Host, sc.Port, sc.DB)
 	err = utils.DoWithTries(func() error {
 		_, cancel := context.WithTimeout(ctx, 5*time.Second)
 		defer cancel()
 
-		pool, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+		pool, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 		if err != nil {
 			return err
 		}
@@ -33,7 +33,7 @@ func NewClient(ctx context.Context, maxAttemps int, sc config.Postgres) (client 
 	}, maxAttemps, 5*time.Second)
 
 	if err != nil {
-		log.Fatal("error to connect in PostgreSQL max attemtps")
+		log.Fatal("error to connect in MySQL max attempts")
 	}
 	return &Client{
 		DB:    pool,

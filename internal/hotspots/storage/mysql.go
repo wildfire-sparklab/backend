@@ -6,14 +6,14 @@ import (
 	"gorm.io/gorm"
 	"time"
 	"wildfire-backend/internal/hotspots"
-	"wildfire-backend/pkg/postgres"
+	"wildfire-backend/pkg/mysql"
 )
 
 type storage struct {
-	client postgres.Client
+	client mysql.Client
 }
 
-func NewHotspotsStorage(client postgres.Client) hotspots.Storage {
+func NewHotspotsStorage(client mysql.Client) hotspots.Storage {
 	return storage{
 		client: client,
 	}

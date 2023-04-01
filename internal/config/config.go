@@ -7,18 +7,18 @@ import (
 )
 
 type Config struct {
-	MapKey   string   `yaml:"mapKey" env:"MAP_KEY"`
-	WindKey  string   `yaml:"windKey" env:"WIND_KEY"`
-	Postgres Postgres `yaml:"postgres"`
-	AMQP     string   `yaml:"amqp" env:"AMQP"`
+	MapKey  string `yaml:"mapKey" env:"MAP_KEY"`
+	WindKey string `yaml:"windKey" env:"WIND_KEY"`
+	MySQL   MySQL  `yaml:"mysql"`
+	AMQP    string `yaml:"amqp" env:"AMQP"`
 }
 
-type Postgres struct {
-	Host     string `yaml:"host" env:"POSTGRES_HOST"`
-	Port     string `yaml:"port" env:"POSTGRES_PORT"`
-	User     string `yaml:"user" env:"POSTGRES_USER"`
-	Password string `yaml:"pass" env:"POSTGRES_PASS"`
-	DB       string `yaml:"db" env:"POSTGRES_DB"`
+type MySQL struct {
+	Host     string `yaml:"host" env:"MYSQL_HOST"`
+	Port     string `yaml:"port" env:"MYSQL_PORT"`
+	User     string `yaml:"user" env:"MYSQL_USER"`
+	Password string `yaml:"pass" env:"MYSQL_PASS"`
+	DB       string `yaml:"db" env:"MYSQL_DB"`
 }
 
 var instance *Config

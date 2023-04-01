@@ -106,7 +106,7 @@ func (s Service) GetsHotSpots() []Hotspot {
 	for _, h := range hotspots {
 		t, err := time.Parse("2006-01-02 15:04", h.AcqData+" "+h.AcqTime.String())
 		if err != nil {
-			fmt.Println("error")
+			fmt.Println(err)
 			continue
 		}
 		//fmt.Println(h.AcqData+" "+h.AcqTime.String(), t)

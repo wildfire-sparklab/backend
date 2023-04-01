@@ -13,10 +13,10 @@ import (
 type service struct {
 	h  hotspots.Service
 	w  wind.Service
-	mq rabbit.Conn
+	mq *rabbit.Conn
 }
 
-func NewChecker(h hotspots.Service, w wind.Service, mq rabbit.Conn) *service {
+func NewChecker(h hotspots.Service, w wind.Service, mq *rabbit.Conn) *service {
 	return &service{
 		h:  h,
 		w:  w,
@@ -91,6 +91,7 @@ type checkerSend struct {
 }
 
 func (s service) Checker() {
+	fmt.Println("Check hotspots...")
 	hotspotss := s.h.GetsHotSpots()
 	s.h.AddsHotsSpots(hotspotss)
 	var winds []wind.WeatherData
@@ -103,16 +104,16 @@ func (s service) Checker() {
 		fmt.Println(err)
 		return
 	}
-	sEnc := base64.StdEncoding.EncodeToString(jsonMessage)
+	_ = base64.StdEncoding.EncodeToString(jsonMessage)
 	if err != nil {
 		fmt.Println(`failed gob Encode`, err)
 	}
 	if err != nil {
 		fmt.Println("Json not convert")
 	}
-	fmt.Println(sEnc)
-	err = s.mq.Publish("broker", []byte(sEnc))
-	if err != nil {
-		fmt.Println("publish error")
-	}
+	//fmt.Println(sEnc)
+	//err = s.mq.Publish("broker", []byte(sEnc))
+	//if err != nil {
+	//	fmt.Println("publish error")
+	//}
 }
