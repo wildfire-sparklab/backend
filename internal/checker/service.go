@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/go-co-op/gocron"
 	"time"
 	"wildfire-backend/internal/hotspots"
 	"wildfire-backend/internal/wind"
@@ -25,19 +26,15 @@ func NewChecker(h hotspots.Service, w wind.Service, mq *rabbit.Conn) *service {
 }
 
 func (s service) StartCheck() {
-	ticker := time.NewTicker(time.Minute * 30)
-	quit := make(chan struct{})
-	go func() {
-		for {
-			select {
-			case <-ticker.C:
-				s.Checker()
-			case <-quit:
-				ticker.Stop()
-				return
-			}
-		}
-	}()
+	loc, _ := time.LoadLocation("Asia/Yakutsk")
+	cron := gocron.NewScheduler(loc)
+	cron.Every(1).Day().At("12:00").Do(func() {
+		s.StartAutomata()
+	})
+	cron.Every("30m").Do(func() {
+		s.StartCheck()
+	})
+	cron.StartAsync()
 }
 
 // пока что тут
@@ -86,19 +83,38 @@ var wind_cords = [][]float64{
 }
 
 type checkerSend struct {
-	Hotspots []hotspots.Hotspot `json:"hotspots"`
-	Winds    []wind.WeatherData `json:"winds"`
+	Hotspots []hotspots.HotspotJson `json:"hotspots"`
+	Winds    []wind.WeatherData     `json:"winds"`
 }
 
 func (s service) Checker() {
 	fmt.Println("Check hotspots...")
 	hotspotss := s.h.GetsHotSpots()
 	s.h.AddsHotsSpots(hotspotss)
-	var winds []wind.WeatherData
-	for _, hotspot := range wind_cords {
-		winds = append(winds, s.w.GetWind(hotspot[1], hotspot[0]))
+}
+
+func (s service) StartAutomata() {
+	fmt.Println("Start automata...")
+	t := time.Now().AddDate(0, 0, -1)
+	hotspotss := s.h.GetsHotSpotsByTime(t)
+	if len(hotspotss) == 0 {
+		return
 	}
-	sendMessage := checkerSend{Hotspots: hotspotss, Winds: winds}
+	var winds []wind.WeatherData
+	var hotpotsss []hotspots.HotspotJson
+	for _, w := range wind_cords {
+		winds = append(winds, s.w.GetWind(w[1], w[0]))
+	}
+	for _, hotspot := range hotspotss {
+		hotpotsss = append(hotpotsss, hotspots.HotspotJson{
+			Id:       hotspot.Id,
+			Time:     hotspot.Time.Unix(),
+			Lan:      hotspot.Lan,
+			Long:     hotspot.Long,
+			DayNight: hotspot.DayNight,
+		})
+	}
+	sendMessage := checkerSend{Hotspots: hotpotsss, Winds: winds}
 	jsonMessage, err := json.Marshal(sendMessage)
 	if err != nil {
 		fmt.Println(err)

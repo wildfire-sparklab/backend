@@ -72,6 +72,11 @@ func (s Service) AddsHotsSpots(hotspots []Hotspot) {
 	}
 }
 
+func (s Service) GetsHotSpotsByTime(t time.Time) []Hotspot {
+	hotstpots, _ := s.storage.GetHotSpots(t)
+	return hotstpots
+}
+
 func (s Service) GetsHotSpots() []Hotspot {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

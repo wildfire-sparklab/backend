@@ -57,6 +57,14 @@ type Hotspot struct {
 	DayNight string
 }
 
+type HotspotJson struct {
+	Id       int64 `gorm:"primaryKey"`
+	Time     int64
+	Long     float64
+	Lan      float64
+	DayNight string
+}
+
 type IgnoreHotspot struct {
 	Id   int `gorm:"primaryKey"`
 	Long float64

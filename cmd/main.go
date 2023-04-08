@@ -7,8 +7,10 @@ import (
 	"wildfire-backend/internal/config"
 	"wildfire-backend/internal/hotspots"
 	"wildfire-backend/internal/hotspots/storage"
+	"wildfire-backend/internal/s3"
 	"wildfire-backend/internal/wind"
 	"wildfire-backend/pkg/mysql"
+	s32 "wildfire-backend/pkg/s3"
 )
 
 func main() {
@@ -20,6 +22,8 @@ func main() {
 	db := mysql.NewClient(context.TODO(), 5, cfg.MySQL)
 	db.DB.AutoMigrate(&hotspots.Hotspot{})
 	db.DB.AutoMigrate(&hotspots.IgnoreHotspot{})
+	s3Client := s32.NewClient(cfg.S3)
+
 	hotspotStorage := storage.NewHotspotsStorage(*db)
 	hostpotService := hotspots.NewHotSpotsService(*cfg, hotspotStorage)
 	windService := wind.NewWindService(*cfg)
@@ -28,6 +32,8 @@ func main() {
 
 	r := gin.Default()
 	hotspotHandler := hotspots.NewHotSpotHandler(hotspotStorage)
+	s3handler := s3.NewS3Handler(s3Client)
+	s3handler.Register(r)
 	hotspotHandler.Register(r)
 	r.Run(":8081")
 }
