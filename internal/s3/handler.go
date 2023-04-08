@@ -33,6 +33,7 @@ func (h *handler) GetTiles(ctx *gin.Context) {
 	object, err := h.client.Client.GetObject(input)
 	if err != nil {
 		fmt.Println(err)
+		ctx.String(404, "not found")
 		return
 	}
 	if object.Body != nil {
