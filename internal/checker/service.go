@@ -28,12 +28,12 @@ func NewChecker(h hotspots.Service, w wind.Service, mq *rabbit.Conn) *service {
 func (s service) StartCheck() {
 	loc, _ := time.LoadLocation("Asia/Yakutsk")
 	cron := gocron.NewScheduler(loc)
-	//cron.Every(1).Day().At("12:00").Do(func() {
-	//	s.StartAutomata()
-	//})
-	//cron.Every("30m").Do(func() {
-	//	s.StartCheck()
-	//})
+	cron.Every(1).Day().At("12:00").Do(func() {
+		s.StartAutomata()
+	})
+	cron.Every("30m").Do(func() {
+		s.StartCheck()
+	})
 	cron.StartAsync()
 }
 

@@ -22,16 +22,14 @@ func NewS3Handler(client s32.Client) handlers.Handler {
 }
 
 func (h handler) Register(router *gin.Engine) {
-	t := router.Group("/tiles/")
-	t.Use(h.GetTiles)
+	router.GET("tiles/:date/:z/:x/:y", h.GetTiles)
 }
 
 func (h *handler) GetTiles(ctx *gin.Context) {
 	input := &s3.GetObjectInput{
 		Bucket: aws.String(h.client.Bucket),
-		Key:    aws.String(ctx.Request.URL.Path),
+		Key:    aws.String(ctx.Param("date") + "/" + ctx.Param("z") + "/" + ctx.Param("x") + "/" + ctx.Param("y")),
 	}
-	fmt.Println(ctx.Request.URL.Path)
 	object, err := h.client.Client.GetObject(input)
 	if err != nil {
 		fmt.Println(err)
