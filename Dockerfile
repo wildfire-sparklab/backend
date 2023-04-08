@@ -16,6 +16,7 @@ CMD ["./main"]
 FROM alpine:3.15.4
 
 WORKDIR /
+RUN apk --no-cache add tzdata
 COPY --from=build /app/config.yml ./
 COPY --from=build /app/main /main
 
