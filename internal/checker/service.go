@@ -32,7 +32,7 @@ func (s service) StartCheck() {
 		s.StartAutomata()
 	})
 	cron.Every("30m").Do(func() {
-		s.StartCheck()
+		s.Checker()
 	})
 	cron.StartAsync()
 }
