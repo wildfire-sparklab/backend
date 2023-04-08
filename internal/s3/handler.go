@@ -22,7 +22,8 @@ func NewS3Handler(client s32.Client) handlers.Handler {
 }
 
 func (h handler) Register(router *gin.Engine) {
-	router.GET("/tiles/", h.GetTiles)
+	t := router.Group("/tiles/")
+	t.Use(h.GetTiles)
 }
 
 func (h *handler) GetTiles(ctx *gin.Context) {
