@@ -22,7 +22,8 @@ func NewClient(cfg config.S3) Client {
 	c := s3.New(s, aws.NewConfig().
 		WithEndpoint("https://s3.storage.selcloud.ru").
 		WithCredentials(creds).
-		WithRegion("ru-1"))
+		WithRegion("ru-1").
+		WithS3ForcePathStyle(true))
 	return Client{
 		Client: c,
 		Bucket: cfg.Bucket,
