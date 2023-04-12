@@ -66,7 +66,9 @@ type ForecastWeatherList struct {
 }
 
 type WeatherData struct {
-	List []ForecastWeatherList `json:"list"`
+	List []ForecastWeatherList `json:"broadcast"`
+	Lan  float64               `json:"lan"`
+	Long float64               `json:"long"`
 }
 
 func (f *Forecast5WeatherData) Decode(r io.Reader) error {

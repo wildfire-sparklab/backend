@@ -57,5 +57,7 @@ func (s Service) GetWind(Long float64, Lan float64) WeatherData {
 			Wind: list.Wind,
 		})
 	}
+	data1.Lan = Lan
+	data1.Long = Long
 	return data1
 }
