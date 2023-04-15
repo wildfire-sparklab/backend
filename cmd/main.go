@@ -60,6 +60,9 @@ func main() {
 	r.Use(CORSMiddleware())
 	gin.SetMode(gin.ReleaseMode)
 	hotspotHandler := hotspots.NewHotSpotHandler(hotspotStorage)
+
+	checkerHandler := checker.NewCheckerHandler(*checkerService)
+	checkerHandler.Register(r)
 	s3handler := s3.NewS3Handler(s3Client)
 	s3handler.Register(r)
 	hotspotHandler.Register(r)

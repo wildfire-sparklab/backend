@@ -27,4 +27,5 @@ func (h *handler) CheckerHandler(ctx *gin.Context) {
 		return
 	}
 	h.s.StartAutomata(t)
+	ctx.Status(200)
 }
