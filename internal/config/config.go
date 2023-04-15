@@ -10,7 +10,7 @@ type Config struct {
 	MapKey  string `yaml:"mapKey" env:"MAP_KEY"`
 	WindKey string `yaml:"windKey" env:"WIND_KEY"`
 	MySQL   MySQL  `yaml:"mysql"`
-	AMQP    string `yaml:"amqp"`
+	AMQP    string `yaml:"amqp" env:"AMQP"`
 	S3      S3     `yaml:"s3"`
 }
 
