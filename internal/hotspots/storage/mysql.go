@@ -2,7 +2,6 @@ package storage
 
 import (
 	"errors"
-	"fmt"
 	"gorm.io/gorm"
 	"time"
 	"wildfire-backend/internal/hotspots"
@@ -31,6 +30,36 @@ func (s storage) AddIgnoreHotSpot(hotspot hotspots.IgnoreHotspot) error {
 
 func (s storage) GetHotSpots(date time.Time) ([]hotspots.Hotspot, error) {
 	var hostspots []hotspots.Hotspot
+	loc, _ := time.LoadLocation("Asia/Yakutsk")
+	dateStart := time.Date(
+		date.Year(),
+		date.Month(),
+		date.Day(),
+		12,
+		0,
+		0,
+		0,
+		loc)
+	dateEnd := time.Date(
+		date.Year(),
+		date.Month(),
+		date.Day()+1,
+		12,
+		0,
+		0,
+		0,
+		loc)
+	err := s.client.DB.Model(&hotspots.Hotspot{}).
+		Where("time BETWEEN ? AND ?", dateStart, dateEnd).
+		Find(&hostspots).Error
+	if err != nil {
+		return nil, err
+	}
+	return hostspots, nil
+}
+
+func (s storage) GetHotSpotsBySite(date time.Time) ([]hotspots.Hotspot, error) {
+	var hostspots []hotspots.Hotspot
 	dateStart := time.Date(
 		date.Year(),
 		date.Month(),
@@ -49,7 +78,6 @@ func (s storage) GetHotSpots(date time.Time) ([]hotspots.Hotspot, error) {
 		0,
 		0,
 		date.Location())
-	fmt.Println(dateStart, dateEnd)
 	err := s.client.DB.Model(&hotspots.Hotspot{}).
 		Where("time BETWEEN ? AND ?", dateStart, dateEnd).
 		Find(&hostspots).Error

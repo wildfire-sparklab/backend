@@ -26,7 +26,7 @@ func (h *handler) GetHotSpots(ctx *gin.Context) {
 		ctx.JSON(500, "Error parse time")
 		return
 	}
-	hotspots, err := h.storage.GetHotSpots(t)
+	hotspots, err := h.storage.GetHotSpotsBySite(t)
 	if err != nil {
 		ctx.JSON(500, "Server error")
 		return

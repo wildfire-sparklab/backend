@@ -124,3 +124,5 @@ func (s Service) GetsHotSpots() []Hotspot {
 	}
 	return hotspots1
 }
+
+//func (h *Hotspot) GetHotSpot(time time.Da)

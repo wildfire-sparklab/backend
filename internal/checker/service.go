@@ -105,6 +105,7 @@ func (s service) StartAutomata() {
 	for _, w := range wind_cords {
 		winds = append(winds, s.w.GetWind(w[1], w[0]))
 	}
+	//s.w.AddWind(winds)
 	for _, hotspot := range hotspotss {
 		hotpotsss = append(hotpotsss, hotspots.HotspotJson{
 			Id:       hotspot.Id,

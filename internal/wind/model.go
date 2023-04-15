@@ -71,6 +71,26 @@ type WeatherData struct {
 	Long float64               `json:"long"`
 }
 
+type TestWeatherData struct {
+	Data []WeatherData `json:"winds"`
+}
+
+type Model struct {
+	Id        int64 `gorm:"primaryKey"`
+	Time      time.Time
+	Lan       float64     `json:"lan"`
+	Long      float64     `json:"long"`
+	Broadcast []BroadCast `json:"broadcast"`
+}
+
+type BroadCast struct {
+	Id      int64   `gorm:"primaryKey"`
+	Dt      int     `json:"dt"`
+	Speed   float64 `json:"speed"`
+	Deg     float64 `json:"deg"`
+	ModelID int64
+}
+
 func (f *Forecast5WeatherData) Decode(r io.Reader) error {
 	if err := json.NewDecoder(r).Decode(&f); err != nil {
 		return err

@@ -1,9 +1,5 @@
 mapKey:
 windKey:
 mysql:
-  host: localhost
-  port: 3306
-  user: test
-  pass: 123123
-  db: wildfire
+
 amqp: "amqp://rmuser:rmpassword@localhost:5672/"
