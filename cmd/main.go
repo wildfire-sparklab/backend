@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"github.com/gin-gonic/gin"
+	"log"
 	"wildfire-backend/internal/checker"
 	"wildfire-backend/internal/config"
 	"wildfire-backend/internal/hotspots"
@@ -11,15 +12,16 @@ import (
 	"wildfire-backend/internal/wind"
 	storage1 "wildfire-backend/internal/wind/storage"
 	"wildfire-backend/pkg/mysql"
+	"wildfire-backend/pkg/rabbit"
 	s32 "wildfire-backend/pkg/s3"
 )
 
 func main() {
 	cfg := config.GetConfig()
-	//conn, err := rabbit.GetConn(cfg.AMQP)
-	//if err != nil {
-	//	log.Panic("Not connection rabbit")
-	//}
+	conn, err := rabbit.GetConn(cfg.AMQP)
+	if err != nil {
+		log.Panic("Not connection rabbit")
+	}
 	db := mysql.NewClient(context.TODO(), 5, cfg.MySQL)
 	db.DB.AutoMigrate(&hotspots.Hotspot{})
 	db.DB.AutoMigrate(&hotspots.IgnoreHotspot{})
@@ -51,7 +53,7 @@ func main() {
 	//	//service.AddWind(result.Data, time.Parse())
 	//}
 	//
-	checkerService := checker.NewChecker(*hostpotService, *windService, nil)
+	checkerService := checker.NewChecker(*hostpotService, *windService, &conn)
 	checkerService.StartCheck()
 
 	r := gin.Default()
