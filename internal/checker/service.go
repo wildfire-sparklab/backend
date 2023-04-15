@@ -29,7 +29,7 @@ func (s service) StartCheck() {
 	loc, _ := time.LoadLocation("Asia/Yakutsk")
 	cron := gocron.NewScheduler(loc)
 	cron.Every(1).Day().At("12:00").Do(func() {
-		s.StartAutomata()
+		s.StartAutomata(time.Now())
 	})
 	cron.Every("30m").Do(func() {
 		s.Checker()
@@ -82,10 +82,10 @@ var wind_cords = [][]float64{
 	{65, 138},
 }
 
-type checkerSend struct {
-	Hotspots []hotspots.HotspotJson `json:"hotspots"`
-	Winds    []wind.WeatherData     `json:"winds"`
-}
+//type checkerSend struct {
+//	Hotspots []hotspots.HotspotJson `json:"hotspots"`
+//	Winds    []wind.WeatherData     `json:"winds"`
+//}
 
 func (s service) Checker() {
 	fmt.Println("Check hotspots...")
@@ -93,44 +93,58 @@ func (s service) Checker() {
 	s.h.AddsHotsSpots(hotspotss)
 }
 
-func (s service) StartAutomata() {
+func (s service) StartAutomata(date time.Time) {
 	fmt.Println("Start automata...")
-	t := time.Now().AddDate(0, 0, -1)
+	t := date.AddDate(0, 0, -1)
 	hotspotss := s.h.GetsHotSpotsByTime(t)
 	if len(hotspotss) == 0 {
+		fmt.Println("array hotspot zero")
 		return
 	}
 	var winds []wind.WeatherData
-	var hotpotsss []hotspots.HotspotJson
 	for _, w := range wind_cords {
 		winds = append(winds, s.w.GetWind(w[1], w[0]))
 	}
-	//s.w.AddWind(winds)
+	s.w.AddWind(winds)
+
+	var hotspotss1 []int64
 	for _, hotspot := range hotspotss {
-		hotpotsss = append(hotpotsss, hotspots.HotspotJson{
-			Id:       hotspot.Id,
-			Time:     hotspot.Time.Unix(),
-			Lan:      hotspot.Lan,
-			Long:     hotspot.Long,
-			DayNight: hotspot.DayNight,
-		})
+		hotspotss1 = append(hotspotss1, hotspot.Id)
 	}
-	sendMessage := checkerSend{Hotspots: hotpotsss, Winds: winds}
-	jsonMessage, err := json.Marshal(sendMessage)
+	windss, err := s.w.GetWinds(date)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	_ = base64.StdEncoding.EncodeToString(jsonMessage)
+	if len(windss) == 0 {
+		fmt.Println("array winds zero")
+		return
+	}
+	var winds1 []int64
+	for _, wind1 := range windss {
+		winds1 = append(winds1, wind1.Id)
+	}
+	sendData := &SendDataDTO{
+		Hotspots: hotspotss1,
+		Winds:    winds1,
+	}
+	jsonMessage, err := json.Marshal(sendData)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	sEnc := base64.StdEncoding.EncodeToString(jsonMessage)
 	if err != nil {
 		fmt.Println(`failed gob Encode`, err)
+		return
 	}
 	if err != nil {
 		fmt.Println("Json not convert")
+		return
 	}
-	//fmt.Println(sEnc)
-	//err = s.mq.Publish("broker", []byte(sEnc))
-	//if err != nil {
-	//	fmt.Println("publish error")
-	//}
+	err = s.mq.Publish("broker", []byte(sEnc))
+	if err != nil {
+		fmt.Println("publish error")
+		return
+	}
 }

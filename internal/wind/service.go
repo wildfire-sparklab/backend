@@ -22,18 +22,17 @@ func NewWindService(cfg config.Config, storage Storage) *Service {
 	}
 }
 
-func (s Service) AddWind(winds []WeatherData, date time.Time) error {
+func (s Service) AddWind(winds []WeatherData) error {
 	for _, w := range winds {
 		model := Model{
 			Lan:  w.Lan,
 			Long: w.Long,
-			Time: date,
+			Time: time.Now(),
 		}
 		model, err := s.storage.AddWind(model)
 		if err != nil {
 			return err
 		}
-		fmt.Println(model)
 		for _, list := range w.List {
 			broadcast := BroadCast{
 				Dt:      list.Dt,
@@ -50,7 +49,7 @@ func (s Service) AddWind(winds []WeatherData, date time.Time) error {
 	return nil
 }
 
-func (s Service) GetWinds(time2 time.Time) (Model, error) {
+func (s Service) GetWinds(time2 time.Time) ([]Model, error) {
 	return s.storage.GetWinds(time2)
 }
 

@@ -28,8 +28,8 @@ func (s storage) AddBroadcast(broadcast wind.BroadCast) error {
 	return err
 }
 
-func (s storage) GetWinds(date time.Time) (wind.Model, error) {
-	var winds wind.Model
+func (s storage) GetWinds(date time.Time) ([]wind.Model, error) {
+	var winds []wind.Model
 	dateStart := time.Date(
 		date.Year(),
 		date.Month(),
@@ -53,7 +53,7 @@ func (s storage) GetWinds(date time.Time) (wind.Model, error) {
 		Where("time BETWEEN ? AND ?", dateStart, dateEnd).
 		Find(&winds).Error
 	if err != nil {
-		return wind.Model{}, err
+		return nil, err
 	}
 	return winds, nil
 }
