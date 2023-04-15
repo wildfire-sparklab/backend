@@ -1,5 +1,3 @@
 mapKey:
 windKey:
-mysql:
-
 amqp: "amqp://rmuser:rmpassword@localhost:5672/"
