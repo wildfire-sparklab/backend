@@ -3,7 +3,6 @@ package storage
 import (
 	"fmt"
 	"time"
-	"wildfire-backend/internal/hotspots"
 	"wildfire-backend/internal/wind"
 	"wildfire-backend/pkg/mysql"
 )
@@ -49,7 +48,7 @@ func (s storage) GetWinds(date time.Time) ([]wind.Model, error) {
 		0,
 		date.Location())
 	fmt.Println(dateStart, dateEnd)
-	err := s.client.DB.Model(&hotspots.Hotspot{}).
+	err := s.client.DB.Model(&wind.Model{}).
 		Where("time BETWEEN ? AND ?", dateStart, dateEnd).
 		Find(&winds).Error
 	if err != nil {
