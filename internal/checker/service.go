@@ -127,6 +127,7 @@ func (s service) StartAutomata(date time.Time) {
 	sendData := &SendDataDTO{
 		Hotspots: hotspotss1,
 		Winds:    winds1,
+		Date:     date.Format("2006-01-02"),
 	}
 	jsonMessage, err := json.Marshal(sendData)
 	if err != nil {
