@@ -101,29 +101,34 @@ func (s service) StartAutomata(date time.Time) {
 		fmt.Println("array hotspot zero")
 		return
 	}
-	var winds []wind.WeatherData
-	for _, w := range wind_cords {
-		winds = append(winds, s.w.GetWind(w[1], w[0]))
-	}
-	s.w.AddWind(winds)
-
-	var hotspotss1 []int64
-	for _, hotspot := range hotspotss {
-		hotspotss1 = append(hotspotss1, hotspot.Id)
-	}
 	windss, err := s.w.GetWinds(date)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	if len(windss) == 0 {
+	if len(windss) == 0 && date.Year() > 2022 {
+		var winds []wind.WeatherData
+		for _, w := range wind_cords {
+			winds = append(winds, s.w.GetWind(w[1], w[0]))
+		}
+		s.w.AddWind(winds)
 		fmt.Println("array winds zero")
+	}
+	windss, err = s.w.GetWinds(date)
+	if err != nil {
+		fmt.Println(err)
 		return
 	}
+	var hotspotss1 []int64
+	for _, hotspot := range hotspotss {
+		hotspotss1 = append(hotspotss1, hotspot.Id)
+	}
+
 	var winds1 []int64
 	for _, wind1 := range windss {
 		winds1 = append(winds1, wind1.Id)
 	}
+	fmt.Println(windss)
 	sendData := &SendDataDTO{
 		Hotspots: hotspotss1,
 		Winds:    winds1,
