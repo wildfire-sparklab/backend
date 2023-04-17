@@ -29,7 +29,9 @@ func (s storage) AddBroadcast(broadcast wind.BroadCast) error {
 
 func (s storage) GetWinds(date time.Time) ([]wind.Model, error) {
 	var winds []wind.Model
-	dateStart := time.Date(
+	var dateStart time.Time
+	var dateEnd time.Time
+	dateStart = time.Date(
 		date.Year(),
 		date.Month(),
 		date.Day(),
@@ -38,11 +40,11 @@ func (s storage) GetWinds(date time.Time) ([]wind.Model, error) {
 		0,
 		0,
 		date.Location())
-	dateEnd := time.Date(
+	dateEnd = time.Date(
 		date.Year(),
 		date.Month(),
 		date.Day(),
-		24,
+		12,
 		0,
 		0,
 		0,
