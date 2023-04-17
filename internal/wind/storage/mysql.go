@@ -29,24 +29,47 @@ func (s storage) AddBroadcast(broadcast wind.BroadCast) error {
 
 func (s storage) GetWinds(date time.Time) ([]wind.Model, error) {
 	var winds []wind.Model
-	dateStart := time.Date(
-		date.Year(),
-		date.Month(),
-		date.Day(),
-		0,
-		0,
-		0,
-		0,
-		date.Location())
-	dateEnd := time.Date(
-		date.Year(),
-		date.Month(),
-		date.Day(),
-		24,
-		0,
-		0,
-		0,
-		date.Location())
+	var dateStart time.Time
+	var dateEnd time.Time
+	if date.Year() < 2023 {
+		dateStart = time.Date(
+			date.Year(),
+			date.Month(),
+			date.Day(),
+			12,
+			0,
+			0,
+			0,
+			date.Location())
+		dateEnd = time.Date(
+			date.Year(),
+			date.Month(),
+			date.Day(),
+			12,
+			0,
+			0,
+			0,
+			date.Location())
+	} else {
+		dateStart = time.Date(
+			date.Year(),
+			date.Month(),
+			date.Day(),
+			0,
+			0,
+			0,
+			0,
+			date.Location())
+		dateEnd = time.Date(
+			date.Year(),
+			date.Month(),
+			date.Day(),
+			24,
+			0,
+			0,
+			0,
+			date.Location())
+	}
 	fmt.Println(dateStart, dateEnd)
 	err := s.client.DB.Model(&wind.Model{}).
 		Where("time BETWEEN ? AND ?", dateStart, dateEnd).
