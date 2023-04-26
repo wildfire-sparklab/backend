@@ -60,24 +60,25 @@ func (s storage) GetHotSpots(date time.Time) ([]hotspots.Hotspot, error) {
 
 func (s storage) GetHotSpotsBySite(date time.Time) ([]hotspots.Hotspot, error) {
 	var hostspots []hotspots.Hotspot
+	loc, _ := time.LoadLocation("Asia/Yakutsk")
 	dateStart := time.Date(
 		date.Year(),
 		date.Month(),
 		date.Day(),
+		12,
 		0,
 		0,
 		0,
-		0,
-		date.Location())
+		loc)
 	dateEnd := time.Date(
 		date.Year(),
 		date.Month(),
-		date.Day(),
-		24,
+		date.Day()+1,
+		12,
 		0,
 		0,
 		0,
-		date.Location())
+		loc)
 	err := s.client.DB.Model(&hotspots.Hotspot{}).
 		Where("time BETWEEN ? AND ?", dateStart, dateEnd).
 		Find(&hostspots).Error
