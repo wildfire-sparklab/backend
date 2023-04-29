@@ -64,7 +64,7 @@ func (s storage) GetHotSpotsBySite(date time.Time) ([]hotspots.Hotspot, error) {
 	dateStart := time.Date(
 		date.Year(),
 		date.Month(),
-		date.Day(),
+		date.Day()-1,
 		12,
 		0,
 		0,
@@ -73,7 +73,7 @@ func (s storage) GetHotSpotsBySite(date time.Time) ([]hotspots.Hotspot, error) {
 	dateEnd := time.Date(
 		date.Year(),
 		date.Month(),
-		date.Day()+1,
+		date.Day(),
 		12,
 		0,
 		0,
